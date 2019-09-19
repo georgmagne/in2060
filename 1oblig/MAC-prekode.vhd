@@ -1,6 +1,6 @@
 library IEEE;
-  use IEEE.STD_LOGIC_1164.all
-  use IEEE.numeric_std.all
+  use IEEE.STD_LOGIC_1164.all;
+  use IEEE.numeric_std.all;
 
   -- Denne kildekoden har lagt inn 2 skrivefeil.
   -- Skriv koden selv, og kommenter feilene der du finner dem.
@@ -19,13 +19,13 @@ architecture behavioral of MAC is
     signal mul1, mul2, add1 : UNSIGNED(width-1 downto 0);
     signal add2, sum        : UNSIGNED(width*2-1 downto 0);
     begin
-      process(clk, reset); -- kanskje feil.
+      process(clk, reset)
 
       begin
-        if reset = "1" then Rd <= (others => "0"); -- asynkron reset.
+        if reset = '1' then Rd <= (others => '0'); -- asynkron reset.
 
       elsif rising_edge(clk) then                     -- Skjer på klokkeflanken.
-        Rd <= STD_LOGIC_VECTOR(sm(width-1 downto 0)); -- Ta vare på LSB.
+        Rd <= STD_LOGIC_VECTOR(sum(width-1 downto 0)); -- Ta vare på LSB. -- Andre feil, sum var sm.
       end if;
 
     end process;
@@ -40,4 +40,3 @@ architecture behavioral of MAC is
     sum <= add1+add2;
 
   end architecture;
-  
