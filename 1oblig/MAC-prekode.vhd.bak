@@ -1,6 +1,6 @@
 library IEEE;
-  use IEEE.STD_LOGIC_1164.all
-  use IEEE.numeric_std.all
+  use IEEE.STD_LOGIC_1164.all;
+  use IEEE.numeric_std.all;
 
   -- Denne kildekoden har lagt inn 2 skrivefeil.
   -- Skriv koden selv, og kommenter feilene der du finner dem.
@@ -8,7 +8,7 @@ library IEEE;
 entity MAC is
     generic (width: integer := 8);
     port(
-        clk, reset  : in STD_LOGIC -- Første feil, mangler semikolon
+        clk, reset  : in STD_LOGIC; -- Første feil, mangler semikolon
         MLS_select  : in STD_LOGIC;
         Rn, Rm, Ra  : in STD_LOGIC_VECTOR(width-1 downto 0);
         Rd          : out STD_LOGIC_VECTOR(width-1 downto 0)
@@ -16,16 +16,22 @@ entity MAC is
     end;
 
 architecture behavioral of MAC is
-    signal mul1, mul2, add1 : UNSIGNED(width-1 downto 0);
-    signal add2, sum        : UNSIGNED(width*2-1 downto 0);
+    signal mul1, mul2, add1 		: UNSIGNED(width-1 downto 0);
+    signal add2, sum      		: UNSIGNED(width*2-1 downto 0);
+    signal buffMul, buffAdd 		: STD_LOGIC_VECTOR(width-1 downto 0);
     begin
-      process(clk, reset); -- kanskje feil.
+      process(clk, reset)
 
       begin
-        if reset = "1" then Rd <= (others => "0"); -- asynkron reset.
+        if reset = '1' then
+          Rd <= (others => '0'); -- asynkron reset.
+          buffMul <=(others => '0');
+          buffAdd <= (others => '0');
 
       elsif rising_edge(clk) then                     -- Skjer på klokkeflanken.
-        Rd <= STD_LOGIC_VECTOR(sm(width-1 downto 0)); -- Ta vare på LSB.
+        buffMul <= mul1*mul2;
+        buffAdd <= Ra;
+        Rd <= STD_LOGIC_VECTOR(sum(width-1 downto 0)); -- Ta vare på LSB. -- Andre feil, sum var sm.
       end if;
 
     end process;
@@ -36,8 +42,7 @@ architecture behavioral of MAC is
     mul1 <= UNSIGNED(Rn);
     mul2 <= UNSIGNED(Rm);
     add1 <= UNSIGNED(Ra);
-    add2 <= mul1*mul2;
-    sum <= add1+add2;
+    add2 <= buffAdd;
+    sum <= buffMul + buffAdd;
 
   end architecture;
-  

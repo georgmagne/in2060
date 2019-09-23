@@ -16,23 +16,17 @@ entity MAC is
     end;
 
 architecture behavioral of MAC is
-    signal mul1, mul2, add1, buffAdd 	: UNSIGNED(width-1 downto 0);
-    signal add2, sum      		        : UNSIGNED(width*2-1 downto 0);
-    signal buffMul 		                : UNSIGNED(width*2-1 downto 0);
-
+    signal mul1, mul2, add1 : UNSIGNED(width-1 downto 0);
+    signal add2, sum        : UNSIGNED(width*2-1 downto 0);
     begin
       process(clk, reset)
 
       begin
-        if reset = '1' then
-          Rd <= (others => '0'); -- asynkron reset.
-          buffMul <= (others => '0');
-          buffAdd <= (others => '0');
+        if reset = '1' then Rd <= (others => '0'); -- asynkron reset.
 
       elsif rising_edge(clk) then                     -- Skjer på klokkeflanken.
-        buffMul <= UNSIGNED(mul1*mul2);
-        buffAdd <= UNSIGNED(Ra);
         Rd <= STD_LOGIC_VECTOR(sum(width-1 downto 0)); -- Ta vare på LSB. -- Andre feil, sum var sm.
+
       end if;
 
     end process;
@@ -42,8 +36,8 @@ architecture behavioral of MAC is
 
     mul1 <= UNSIGNED(Rn);
     mul2 <= UNSIGNED(Rm);
-    add1 <= buffAdd; -- Endrer add1 til å være den buffrete verdien til ra
-    add2 <= buffMul; -- Endrer add2 til å være den buffrete verdien til produktet Rn*Rm
-    sum <= add1 + add2;
+    add1 <= UNSIGNED(Ra);
+    add2 <= mul1*mul2;
+    sum <= add1+add2;
 
   end architecture;
