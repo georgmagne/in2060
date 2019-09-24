@@ -16,9 +16,9 @@ entity MAC is
     end;
 
 architecture behavioral of MAC is
-    signal mul1, mul2, add1, buffAdd 	: UNSIGNED(width-1 downto 0);
-    signal add2, sum      		        : UNSIGNED(width*2-1 downto 0);
-    signal buffMul 		                : UNSIGNED(width*2-1 downto 0);
+    signal mul1, mul2, add1, buffAdd 	: UNSIGNED(width-1 downto 0); -- Lagt til buffAdd, som buffer til Ra.
+    signal add2, sum      		        : UNSIGNED(width*2-1 downto 0); -- Hvorfor må disse være 16bits?
+    signal buffMul 		                : UNSIGNED(width*2-1 downto 0); -- Lagt til buffMul, som buffer til produktet Rm*Rn.
 
     begin
       process(clk, reset)
@@ -26,7 +26,7 @@ architecture behavioral of MAC is
       begin
         if reset = '1' then
           Rd <= (others => '0'); -- asynkron reset.
-          buffMul <= (others => '0');
+          buffMul <= (others => '0'); -- Resetter bufferene
           buffAdd <= (others => '0');
 
       elsif rising_edge(clk) then                     -- Skjer på klokkeflanken.
