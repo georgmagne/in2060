@@ -41,7 +41,7 @@ architecture behavioral of MAC is
         buffProd <= add2;
         buffRa <= add1;
 
-        buffMLS2 <= buffMLS;            -- Buffer for buffMLS.
+        buffMLS2 <= buffMLS;            -- Buffer for buffMLS. Må ha dette slik at MLS opererer signalene som hører til hverandre.
         buffMLS <= MLS_select;          -- Buffer for MLS_select.
 
         buffSum <= sum;                 -- Buffer for summeringen

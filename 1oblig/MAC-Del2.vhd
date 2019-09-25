@@ -31,7 +31,7 @@ architecture behavioral of MAC is
       elsif rising_edge(clk) then                 -- Skjer på positiv klokkeflanke.
         buffProd <= add2;                         -- buffProd settes til produktet til Rn*Rm
         buffRa <= add1;                           -- buddRa settes til verdien Ra har
-        
+
         Rd <= STD_LOGIC_VECTOR(sum(width-1 downto 0)); -- Ta vare på LSB. -- Andre feil, sum var sm.
       end if;
 

@@ -17,23 +17,20 @@ entity MAC is
     end;
 
 architecture behavioral of MAC is
-    signal buffMLS, buffMLS2           : STD_LOGIC;
+    signal buffMLS                     : STD_LOGIC;
     signal mul1, mul2, add1, buffRa 	 : UNSIGNED(width-1 downto 0);
-    signal add2, sum, sub              : UNSIGNED(width*2-1 downto 0);
-    signal buffProd, buffSum, buffSub  : UNSIGNED(width*2-1 downto 0);
+    signal add2, sum, sub, buffProd    : UNSIGNED(width*2-1 downto 0);
 
     begin
       process(clk, reset)
 
       begin
-        if reset = '1' then
+        if reset = '1' then  -- Skjer når reset er høy.
           Rd <= (others => '0');          -- asynkron reset.
           buffProd <= (others => '0');
           buffRa <= (others => '0');
-          buffMLS <= '0';                --
-          buffMLS2 <= '0';               -- En buffer som skal buffre bufferen til MLS.
-          buffSum <= (others => '0');
-          buffSub <= (others => '0');
+          buffMLS <= '0';                -- Buffer for MLS_select
+
 
 
 
@@ -43,10 +40,10 @@ architecture behavioral of MAC is
 
         buffMLS <= MLS_select;          -- Buffer for MLS_select.
 
-        if buffMLS = '1' then
+        if buffMLS = '1' then -- Når MLS_select er høy:  (Rn*Rm) - Ra
           Rd <= STD_LOGIC_VECTOR(sub(width-1 downto 0)); -- Tar vare på de 8 LSBene til buffSub og setter Rd lik disse.
 
-        elsif buffMLS = '0' then
+        elsif buffMLS = '0' then -- Når MLS_select er lav:  (Rn*Rm) + Ra
           Rd <= STD_LOGIC_VECTOR(sum(width-1 downto 0)); -- Tar vare på de 8 LSBene til buffSum og setter Rd lik disse.
         end if;
 
