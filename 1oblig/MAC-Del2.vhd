@@ -16,22 +16,22 @@ entity MAC is
     end;
 
 architecture behavioral of MAC is
-    signal mul1, mul2, add1, buffAdd 	: UNSIGNED(width-1 downto 0);     -- Lagt til buffAdd, som buffer til Ra.
-    signal add2, sum      		        : UNSIGNED(width*2-1 downto 0);   -- Hvorfor må disse være 16bits?
-    signal buffProd 		              : UNSIGNED(width*2-1 downto 0); -- Lagt til buffProd, som buffer til produktet Rm*Rn.
+    signal mul1, mul2, add1, buffRa 	: UNSIGNED(width-1 downto 0);     -- Lagt til buffRa, som buffer til Ra.
+    signal add2, sum, buffProd        : UNSIGNED(width*2-1 downto 0);   -- Lagt til buffProd, som buffer til produktet Rm*Rn.
 
     begin
       process(clk, reset)
 
       begin
         if reset = '1' then
-          Rd <= (others => '0');      -- asynkron reset.
-          buffProd <= (others => '0'); -- Resetter bufferene
-          buffAdd <= (others => '0');
+          Rd <= (others => '0');                  -- asynkron reset.
+          buffProd <= (others => '0');            -- Resetter bufferene
+          buffRa <= (others => '0');
 
-      elsif rising_edge(clk) then                     -- Skjer på klokkeflanken.
-        buffProd <= UNSIGNED(mul1*mul2);
-        buffAdd <= UNSIGNED(Ra);
+      elsif rising_edge(clk) then                 -- Skjer på positiv klokkeflanke.
+        buffProd <= add2;                         -- buffProd settes til produktet til Rn*Rm
+        buffRa <= add1;                           -- buddRa settes til verdien Ra har
+        
         Rd <= STD_LOGIC_VECTOR(sum(width-1 downto 0)); -- Ta vare på LSB. -- Andre feil, sum var sm.
       end if;
 
@@ -42,8 +42,8 @@ architecture behavioral of MAC is
 
     mul1 <= UNSIGNED(Rn);
     mul2 <= UNSIGNED(Rm);
-    add1 <= buffAdd; -- Endrer add1 til å være den buffrete verdien til ra
-    add2 <= buffProd; -- Endrer add2 til å være den buffrete verdien til produktet Rn*Rm
-    sum <= add1 + add2;
+    add1 <= UNSIGNED(Ra);
+    add2 <= mul1*mul2;
+    sum <= buffRa + buffProd;    -- Ender sum til å være summen av bufferene til Ra og Rn*Rm.
 
   end architecture;

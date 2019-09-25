@@ -1,13 +1,13 @@
 library IEEE; 
   use IEEE.STD_LOGIC_1164.all;
 --  use IEEE.numeric_std.all; -- Bruker ikke numeric_std i testbenk
-  
+
 entity MAC_testbenk is   -- "nothing" Bruker ikke IO ut av testbenk
   generic (width: integer := 8);
  end;
 
 architecture sim of MAC_testbenk is
-	
+
 	component MAC
 		port(
 			clk, reset: in STD_LOGIC;
@@ -22,8 +22,8 @@ architecture sim of MAC_testbenk is
 	signal 	tb_Rd          		:   STD_LOGIC_VECTOR(width-1 downto 0);
 	signal  tb_MLS_select    :   STD_LOGIC;
 	begin
-	
-	DUT: MAC 
+
+	DUT: MAC
 	--generic map(width := width);
 	port map(
 		clk => tb_clk,
@@ -34,31 +34,31 @@ architecture sim of MAC_testbenk is
 		Rd => tb_Rd,
 		MLS_select => tb_MLS_select
 	);
-	
-	
 
-	process   --–– lage klokke:
+
+
+	process   --ï¿½ï¿½ lage klokke:
 	begin
 	   tb_clk <= '1';
-	   wait for 100 ns; -- "wait" er ikke syntetiserbar, og brukes bare i testbenker. 
+	   wait for 100 ns; -- "wait" er ikke syntetiserbar, og brukes bare i testbenker.
 	   tb_clk <= '0';
 	   wait for 100 ns;
 	end process;
 
-	process   -- merk at begge prosessene her kjøres samtidig, og på repeat... 
+	process   -- merk at begge prosessene her kjï¿½res samtidig, og pï¿½ repeat...
 	begin
 		wait for 231 ns;
 		tb_reset <= '0';
 		wait for 100 ns;
 		tb_reset <= '1';
-		tb_MLS_select <= '0'; -- Kjør MLA når MLS_select er lav ('0')
+		tb_MLS_select <= '0'; -- Kjï¿½r MLA nï¿½r MLS_select er lav ('0')
 		tb_Rm <= "00001000"; -- 8
 		tb_Rn <= "00000111"; -- 7
 		tb_Ra <= "00000110"; -- 6
 		wait for 200 ns;
 		tb_reset <= '0';
 		wait for 200 ns;
-		tb_MLS_select <= '1'; -- Kjør MLS når MLS_select er høy ('1') fom del3
+		tb_MLS_select <= '1'; -- Kjï¿½r MLS nï¿½r MLS_select er hï¿½y ('1') fom del3
 		wait for 200 ns;
 		tb_Rm <= "00000101"; -- 5
 		tb_Rn <= "00000100"; -- 4
@@ -69,6 +69,5 @@ architecture sim of MAC_testbenk is
 		tb_Ra <= "00000000"; -- 0
 		wait for 400 ns;
 	end process;
-		
+
 	end architecture;
-      

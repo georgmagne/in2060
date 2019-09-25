@@ -4,22 +4,23 @@ library IEEE;
 
   -- Denne kildekoden har lagt inn 2 skrivefeil.
   -- Skriv koden selv, og kommenter feilene der du finner dem.
+  -- Del 4
 
 entity MAC is
     generic (width: integer := 8);
     port(
-        clk, reset  : in STD_LOGIC;
-        MLS_select  : in STD_LOGIC;
-        Rn, Rm, Ra  : in STD_LOGIC_VECTOR(width-1 downto 0);
-        Rd          : out STD_LOGIC_VECTOR(width-1 downto 0)
+        clk, reset                     : in STD_LOGIC;
+        MLS_select                     : in STD_LOGIC;
+        Rn, Rm, Ra                     : in STD_LOGIC_VECTOR(width-1 downto 0);
+        Rd                             : out STD_LOGIC_VECTOR(width-1 downto 0)
     );
     end;
 
 architecture behavioral of MAC is
-    signal buffMLS, buffMLS2                    : STD_LOGIC;
-    signal mul1, mul2, add1, buffRa 	: UNSIGNED(width-1 downto 0);
-    signal add2, sum, sub             : UNSIGNED(width*2-1 downto 0);
-    signal buffProd, buffSum, buffSub : UNSIGNED(width*2-1 downto 0);
+    signal buffMLS, buffMLS2           : STD_LOGIC;
+    signal mul1, mul2, add1, buffRa 	 : UNSIGNED(width-1 downto 0);
+    signal add2, sum, sub              : UNSIGNED(width*2-1 downto 0);
+    signal buffProd, buffSum, buffSub  : UNSIGNED(width*2-1 downto 0);
 
     begin
       process(clk, reset)
@@ -29,26 +30,28 @@ architecture behavioral of MAC is
           Rd <= (others => '0');          -- asynkron reset.
           buffProd <= (others => '0');
           buffRa <= (others => '0');
-          buffMLS <= '0';
+          buffMLS <= '0';                --
+          buffMLS2 <= '0';               -- En buffer som skal buffre bufferen til MLS.
           buffSum <= (others => '0');
           buffSub <= (others => '0');
 
 
+
       elsif rising_edge(clk) then          -- Skjer på klokkeflanken.
-        buffRa <= add1;
         buffProd <= add2;
+        buffRa <= add1;
 
-        buffMLS2 <= buffMLS;
-        buffMLS <= MLS_select;
+        buffMLS2 <= buffMLS;            -- Buffer for buffMLS.
+        buffMLS <= MLS_select;          -- Buffer for MLS_select.
 
-        buffSum <= sum;
-        buffSub <= sub;
+        buffSum <= sum;                 -- Buffer for summeringen
+        buffSub <= sub;                 -- Buffer for subraksjonen
 
         if buffMLS2 = '1' then
-          Rd <= STD_LOGIC_VECTOR(buffSub(width-1 downto 0));
+          Rd <= STD_LOGIC_VECTOR(buffSub(width-1 downto 0)); -- Tar vare på de 8 LSBene til buffSub og setter Rd lik disse.
 
         elsif buffMLS2 = '0' then
-          Rd <= STD_LOGIC_VECTOR(buffSum(width-1 downto 0)); -- Ta vare på LSB. -- Andre feil, sum var sm.
+          Rd <= STD_LOGIC_VECTOR(buffSum(width-1 downto 0)); -- Tar vare på de 8 LSBene til buffSum og setter Rd lik disse.
         end if;
 
       end if;

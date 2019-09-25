@@ -4,35 +4,56 @@ library IEEE;
 
   -- Denne kildekoden har lagt inn 2 skrivefeil.
   -- Skriv koden selv, og kommenter feilene der du finner dem.
+  -- Del 4
 
 entity MAC is
     generic (width: integer := 8);
     port(
-        clk, reset  : in STD_LOGIC; -- Første feil, mangler semikolon
-        MLS_select  : in STD_LOGIC;
-        Rn, Rm, Ra  : in STD_LOGIC_VECTOR(width-1 downto 0);
-        Rd          : out STD_LOGIC_VECTOR(width-1 downto 0)
+        clk, reset                     : in STD_LOGIC;
+        MLS_select                     : in STD_LOGIC;
+        Rn, Rm, Ra                     : in STD_LOGIC_VECTOR(width-1 downto 0);
+        Rd                             : out STD_LOGIC_VECTOR(width-1 downto 0)
     );
     end;
 
 architecture behavioral of MAC is
-    signal mul1, mul2, add1, buffAdd 	: UNSIGNED(width-1 downto 0);     -- Lagt til buffAdd, som buffer til Ra.
-    signal add2, sum      		        : UNSIGNED(width*2-1 downto 0);   -- Hvorfor må disse være 16bits?
-    signal buffProd 		              : UNSIGNED(width*2-1 downto 0); -- Lagt til buffProd, som buffer til produktet Rm*Rn.
+    signal buffMLS, buffMLS2           : STD_LOGIC;
+    signal mul1, mul2, add1, buffRa 	 : UNSIGNED(width-1 downto 0);
+    signal add2, sum, sub              : UNSIGNED(width*2-1 downto 0);
+    signal buffProd, buffSum, buffSub  : UNSIGNED(width*2-1 downto 0);
 
     begin
       process(clk, reset)
 
       begin
         if reset = '1' then
-          Rd <= (others => '0');      -- asynkron reset.
-          buffProd <= (others => '0'); -- Resetter bufferene
-          buffAdd <= (others => '0');
+          Rd <= (others => '0');          -- asynkron reset.
+          buffProd <= (others => '0');
+          buffRa <= (others => '0');
+          buffMLS <= '0';                --
+          buffMLS2 <= '0';               -- En buffer som skal buffre bufferen til MLS.
+          buffSum <= (others => '0');
+          buffSub <= (others => '0');
 
-      elsif rising_edge(clk) then                     -- Skjer på klokkeflanken.
-        buffProd <= UNSIGNED(mul1*mul2);
-        buffAdd <= UNSIGNED(Ra);
-        Rd <= STD_LOGIC_VECTOR(sum(width-1 downto 0)); -- Ta vare på LSB. -- Andre feil, sum var sm.
+
+
+      elsif rising_edge(clk) then          -- Skjer på klokkeflanken.
+        buffProd <= add2;
+        buffRa <= add1;
+
+        buffMLS2 <= buffMLS;            -- Buffer for buffMLS.
+        buffMLS <= MLS_select;          -- Buffer for MLS_select.
+
+        buffSum <= sum;                 -- Buffer for summeringen
+        buffSub <= sub;                 -- Buffer for subraksjonen
+
+        if buffMLS2 = '1' then
+          Rd <= STD_LOGIC_VECTOR(buffSub(width-1 downto 0)); -- Tar vare på de 8 LSBene til buffSub og setter Rd lik disse.
+
+        elsif buffMLS2 = '0' then
+          Rd <= STD_LOGIC_VECTOR(buffSum(width-1 downto 0)); -- Tar vare på de 8 LSBene til buffSum og setter Rd lik disse.
+        end if;
+
       end if;
 
     end process;
@@ -42,8 +63,9 @@ architecture behavioral of MAC is
 
     mul1 <= UNSIGNED(Rn);
     mul2 <= UNSIGNED(Rm);
-    add1 <= buffAdd; -- Endrer add1 til å være den buffrete verdien til ra
-    add2 <= buffProd; -- Endrer add2 til å være den buffrete verdien til produktet Rn*Rm
-    sum <= add1 + add2;
+    add1 <= UNSIGNED(Ra);
+    add2 <= mul1*mul2;
+    sum <= buffRa + buffProd; -- Endrer sum til å bruke bufferene ikke inputene direkte.
+    sub <= buffRa - buffProd; -- Endrer sub til å bruke bufferene ikke inputene direkte.
 
   end architecture;
